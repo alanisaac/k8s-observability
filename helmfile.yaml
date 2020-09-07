@@ -1,35 +1,46 @@
 repositories:
-    - name: stable
-    url: https://kubernetes-charts.storage.googleapis.com
-    - name: bitnami
-    url: https://charts.bitnami.com/bitnami
-    - name: elastic
-    url: https://helm.elastic.co
+- name: stable
+  url: https://kubernetes-charts.storage.googleapis.com
+- name: bitnami
+  url: https://charts.bitnami.com/bitnami
+- name: elastic
+  url: https://helm.elastic.co
 
 releases:
-    - name: prometheus-operator
-    namespace: monitoring
-    createNamespace: true
-    chart: stable/prometheus-operator
-    - name: elasticsearch
-    namespace: monitoring
-    createNamespace: true
-    chart: elastic/elasticsearch
-    - name: logstash
-    namespace: monitoring
-    createNamespace: true
-    chart: elastic/logstash
-    - name: kibana
-    namespace: monitoring
-    createNamespace: true
-    chart: elastic/kibana
-    - name: filebeat
-    namespace: monitoring
-    createNamespace: true
-    chart: elastic/filebeat
+- name: metrics-server
+  chart: stable/metrics-server
+  namespace: kube-system
+  condition: metrics-server.enabled
+  set:
+  - name: kubelet-insecure-tls
+    value: true
+  - name: kubelet-preferred-address-types
+    value: InternalIP
+- name: prometheus-operator
+  chart: stable/prometheus-operator
+  namespace: monitoring
+  disableValidation: true
+- name: elasticsearch
+  namespace: monitoring
+  chart: elastic/elasticsearch
+  values:
+  - elasticsearch.yaml
+- name: logstash
+  namespace: monitoring
+  chart: elastic/logstash
+- name: kibana
+  namespace: monitoring
+  chart: elastic/kibana
+- name: filebeat
+  namespace: monitoring
+  chart: elastic/filebeat
+  values:
+  - filebeat.yaml
+- name: kafka
+  namespace: monitoring
+  chart: bitnami/kafka
+  
+environments:
+  default:
     values:
-        - filebeat.yaml
-    - name: kafka
-    namespace: monitoring
-    createNamespace: true
-    chart: bitnami/kafka
+    - environments/default/values.yaml
