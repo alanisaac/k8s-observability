@@ -25,7 +25,7 @@ kubectl apply -f busybox-loop.yaml -n execution
 ### Kibana
 - Set up a port forward for Kibana for `5601:5601`
 - Navigate to http://localhost:5601
-- Set up the default index pattern as `filebeat-*`
+- Set up the default index pattern as `logstash-*`
 
 ## Notes
 - This helmfile has been tweaked to support Docker Desktop.  For example:
