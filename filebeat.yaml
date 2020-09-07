@@ -11,16 +11,11 @@ filebeatConfig:
                 - type: container
                   paths:
                     - /var/log/containers/*-${data.kubernetes.container.id}.log
-    output.elasticsearch:
-      host: '${NODE_NAME}'
-      hosts: '${ELASTICSEARCH_HOSTS:elasticsearch-master:9200}'
-# output.kafka:
-#   codec.format:
-#   string: '%{[@timestamp]} %{[message]}'
-#   hosts: '${KAFKA_HOSTS:9092}'
-#   topic: containers
-#   partition.round_robin:
-#     reachable_only: false
-#   required_acks: 1
-#   compression: gzip
-#   max_message_bytes: 1000000
+    output.kafka:
+      hosts: '${KAFKA_HOSTS:kafka:9092}'
+      topic: execution
+      partition.round_robin:
+        reachable_only: false
+      required_acks: 1
+      compression: gzip
+      max_message_bytes: 1000000

@@ -1,0 +1,14 @@
+logstashPipeline:
+  logstash.conf: |
+    input {
+      kafka {
+        codec => json
+        bootstrap_servers => "kafka:9092"
+        topics => "execution"
+      }
+    }
+    output { 
+      elasticsearch {
+        hosts => ["elasticsearch-master:9200"]
+      } 
+    }

@@ -28,6 +28,8 @@ releases:
 - name: logstash
   namespace: monitoring
   chart: elastic/logstash
+  values:
+  - logstash.yaml
 - name: kibana
   namespace: monitoring
   chart: elastic/kibana
@@ -39,6 +41,8 @@ releases:
 - name: kafka
   namespace: monitoring
   chart: bitnami/kafka
+  values:
+  - kafka.yaml
   
 environments:
   default:
