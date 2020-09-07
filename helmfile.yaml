@@ -1,0 +1,35 @@
+repositories:
+    - name: stable
+    url: https://kubernetes-charts.storage.googleapis.com
+    - name: bitnami
+    url: https://charts.bitnami.com/bitnami
+    - name: elastic
+    url: https://helm.elastic.co
+
+releases:
+    - name: prometheus-operator
+    namespace: monitoring
+    createNamespace: true
+    chart: stable/prometheus-operator
+    - name: elasticsearch
+    namespace: monitoring
+    createNamespace: true
+    chart: elastic/elasticsearch
+    - name: logstash
+    namespace: monitoring
+    createNamespace: true
+    chart: elastic/logstash
+    - name: kibana
+    namespace: monitoring
+    createNamespace: true
+    chart: elastic/kibana
+    - name: filebeat
+    namespace: monitoring
+    createNamespace: true
+    chart: elastic/filebeat
+    values:
+        - filebeat.yaml
+    - name: kafka
+    namespace: monitoring
+    createNamespace: true
+    chart: bitnami/kafka
