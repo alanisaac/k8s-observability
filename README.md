@@ -1,5 +1,9 @@
 # basic-k8s-stack
-A repository to set up a basic k8s stack with monitoring
+A repository to set up a basic k8s stack with monitoring.  The goal is to set up a logging and metrics collection stack that targets a single namespace.
+
+In this example, logging is set up with [this architecture](https://logz.io/blog/deploying-kafka-with-elk/), incorporating Filebeat, Kafka, Logstash, Elasticsearch, and Kibana.
+
+Metrics are set up with Prometheus and Grafana, though it may be worth it to consider Metricbeat as well.
 
 ## Setup
 - You will need the default k8s cluster provided by Docker Desktop (Mac or WSL2 should both work)
