@@ -1,0 +1,14 @@
+storage:
+  type: elasticsearch
+  kafka:
+    brokers:
+      - kafka:9092
+    topic: spans
+
+provisionDataStore:
+  cassandra: false
+  elasticsearch: false
+  kafka: false
+
+ingester:
+  enabled: true

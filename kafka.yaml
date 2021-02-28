@@ -1,1 +1,2 @@
 autoCreateTopicsEnable: true
+logRetentionHours: 24

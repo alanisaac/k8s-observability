@@ -1,0 +1,14 @@
+grafana:
+  adminPassword: password
+
+nodeExporter:
+  enabled: false
+
+prometheus:
+  prometheusSpec:
+    containers:
+    # fix for jaeger injection bug: https://github.com/helm/charts/issues/22769
+    - name: prometheus
+      env:
+      - name: JAEGER_AGENT_PORT
+        value: "5755"  

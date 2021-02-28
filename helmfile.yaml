@@ -1,50 +1,70 @@
 repositories:
-- name: stable
-  url: https://kubernetes-charts.storage.googleapis.com
 - name: bitnami
   url: https://charts.bitnami.com/bitnami
 - name: elastic
   url: https://helm.elastic.co
+- name: prometheus
+  url: https://prometheus-community.github.io/helm-charts
+- name: grafana
+  url: https://grafana.github.io/helm-charts
+- name: kube-state-metrics
+  url: https://kubernetes.github.io/kube-state-metrics
+- name: jaegertracing
+  url: https://jaegertracing.github.io/helm-charts
 
 releases:
-- name: metrics-server
-  chart: stable/metrics-server
-  namespace: kube-system
-  condition: metrics-server.enabled
-  set:
-  - name: kubelet-insecure-tls
-    value: true
-  - name: kubelet-preferred-address-types
-    value: InternalIP
-- name: prometheus-operator
-  chart: stable/prometheus-operator
-  namespace: monitoring
-  disableValidation: true
-- name: elasticsearch
-  namespace: monitoring
-  chart: elastic/elasticsearch
-  values:
-  - elasticsearch.yaml
-- name: logstash
-  namespace: monitoring
-  chart: elastic/logstash
-  values:
-  - logstash.yaml
-- name: kibana
-  namespace: monitoring
-  chart: elastic/kibana
-- name: filebeat
-  namespace: monitoring
-  chart: elastic/filebeat
-  values:
-  - filebeat.yaml
+# common
 - name: kafka
-  namespace: monitoring
+  namespace: observability
   chart: bitnami/kafka
+  version: 12.9.5
   values:
   - kafka.yaml
-  
-environments:
-  default:
-    values:
-    - environments/default/values.yaml
+- name: elasticsearch
+  namespace: observability
+  chart: elastic/elasticsearch
+  version: 7.11.1
+  values:
+  - elasticsearch.yaml
+- name: kibana
+  namespace: observability
+  chart: elastic/kibana
+  version: 7.11.1
+  values:
+  - kibana.yaml
+
+# logging
+- name: filebeat
+  namespace: observability
+  chart: elastic/filebeat
+  version: 7.11.1
+  values:
+  - filebeat.yaml
+- name: logstash
+  namespace: observability
+  chart: elastic/logstash
+  version: 7.11.1
+  values:
+  - logstash.yaml
+
+# metrics
+- name: prometheus
+  namespace: observability
+  chart: prometheus/kube-prometheus-stack
+  version: 13.13.0
+  # see https://github.com/roboll/helmfile/issues/1353
+  disableValidation: true
+  values:
+  - prometheus.yaml
+- name: prometheus-node-exporter
+  namespace: observability
+  chart: prometheus/prometheus-node-exporter
+  version: 1.11.2
+
+# tracing
+- name: jaeger
+  namespace: observability
+  chart: jaegertracing/jaeger
+  version: 0.42.0
+  values:
+  - jaeger.yaml

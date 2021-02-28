@@ -1,0 +1,22 @@
+lifecycle:
+  postStart:
+    exec:
+      command:
+      - bash
+      - -c
+      - |
+        #!/bin/bash
+        # Config for index patterns
+        KIBANA_URL=http://localhost:5601
+  
+        # Wait until service is ready
+        while [[ "$(curl -s -o /dev/null -w '%{http_code}\n' $KIBANA_URL/app/kibana)" != "200" ]]; do sleep 1; done
+  
+        # Apply default Index Patterns into Kibana
+        curl  -X POST -v $KIBANA_URL/api/saved_objects/index-pattern/default_logstash \
+        -H 'kbn-xsrf: true' -H 'Content-Type: application/json' \
+        -d '{"attributes": {"title": "'logstash-*'", "timeFieldName": "@timestamp"}}'
+
+        curl  -X POST -v $KIBANA_URL/api/saved_objects/index-pattern/default_jaeger \
+        -H 'kbn-xsrf: true' -H 'Content-Type: application/json' \
+        -d '{"attributes": {"title": "'jaeger-span-*'", "timeFieldName": "startTimeMillis"}}'
