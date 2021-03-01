@@ -11,6 +11,7 @@ filebeatConfig:
                 - type: container
                   paths:
                     - /var/log/containers/*-${data.kubernetes.container.id}.log
+                  json.keys_under_root: false
     output.kafka:
       hosts: '${KAFKA_HOSTS:kafka:9092}'
       topic: logs
