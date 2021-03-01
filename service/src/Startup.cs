@@ -8,7 +8,7 @@ namespace MyApp
 {
     public class Startup
     {
-        private readonly string _healthCheckPath = "/ping";
+        private const string _healthCheckPath = "/ping";
 
         public Startup(IConfiguration configuration)
         {
@@ -24,7 +24,10 @@ namespace MyApp
             services.AddHealthChecks();
             services.AddOpenTracing(x =>
             {
-                x.ConfigureHttpHandler(h => h.IgnorePatterns.Add(m => m.RequestUri.AbsolutePath == _healthCheckPath));
+                x.ConfigureAspNetCore(options =>
+                {
+                    options.Hosting.IgnorePatterns.Add(ctx => ctx.Request.Path == _healthCheckPath);
+                });
             });
             services.AddJaeger(Configuration);
         }
