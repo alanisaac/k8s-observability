@@ -76,4 +76,10 @@ tolerations: []
 
 affinity: {}
 
-env: []
+env:
+  - name: JAEGER_SERVICE_NAME
+    value: my-app
+  - name: JAEGER_AGENT_HOST
+    value: jaeger-agent.observability.svc
+  - name: JAEGER_SAMPLER_TYPE
+    value: const
