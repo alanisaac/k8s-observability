@@ -10,15 +10,21 @@ A repository to demonstrate a Kubernetes cluster that uses modern, open-source o
   - You may need to install [helm-diff](https://github.com/databus23/helm-diff) separately as well
 
 ### Installation
-Run the following command to install onto a k8s cluster:
+For a fresh install, there are two components to deploy:
 
 ```sh
-helmfile apply
+# deploy the observability stack
+./deploy-observability.sh
+
+# deploy the sample service
+./deploy-service.sh
 ```
 
 It may take several minutes for all services to stabilize and enter the running state.  Once that's completed, you can access services using port forwards:
 
 ```sh
+# Service
+kubectl port-forward -n apps deployment/my-app-release 8080:80
 # Kibana
 kubectl port-forward -n observability deployment/kibana-kibana 5601:5601
 # Grafana
@@ -32,7 +38,7 @@ Values have been tweaked specifically to support a local Kubernetes cluster.  Fo
 - The main Elasticsearch chart requires a multi-node cluster by default.  The values here are [for Docker Desktop](https://github.com/elastic/helm-charts/blob/master/elasticsearch/examples/docker-for-mac/values.yaml) and a single-node cluster.
 - The Prometheus Node Exporter cannot run on local docker-desktop at the current version, so an older one is used.  See the helmfile for more details.
 
-## The Observability Stack
+## The Stack
 
 ### Logging
 The logging solution is a full ELK stack, using the following tools:
@@ -52,3 +58,11 @@ The metrics solution is the Prometheus & Grafana stack.
 The tracing solution is Jaeger, with an Elasticsearch backend.  Since Elasticsearch and Kafka are already deployed for logging, the same deployments are reused.
 
 See the Jaeger [architecture diagram](https://www.jaegertracing.io/docs/1.22/architecture/) for more information.
+
+### Service
+The configurations of logging, metrics, and tracing above form an "observability contract": any service which conforms to that contract will be monitored without additional configuration.  The contract is:
+
+- Services that are deployed in the "apps" namespace
+- Which log to the console in JSON format
+- Which expose metrics at "/metrics" in the Prometheus text format
+- Which send Jaeger trace data over UDP to the endpoint specified by the env variables `JAEGER_AGENT_HOST:JAEGER_AGENT_PORT`

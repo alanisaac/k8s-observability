@@ -1,0 +1,1 @@
+helmfile -f ./helm/helmfile.yaml apply

@@ -81,5 +81,7 @@ env:
     value: my-app
   - name: JAEGER_AGENT_HOST
     value: jaeger-agent.observability.svc
+  - name: JAEGER_AGENT_PORT
+    value: 6381
   - name: JAEGER_SAMPLER_TYPE
     value: const
