@@ -8,6 +8,8 @@ namespace MyApp
 {
     public class Startup
     {
+        private readonly string _healthCheckPath = "/ping";
+
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
@@ -20,8 +22,11 @@ namespace MyApp
         {
             services.AddControllers();
             services.AddHealthChecks();
-            services.AddOpenTracing();
-            services.AddJaeger();
+            services.AddOpenTracing(x =>
+            {
+                x.ConfigureHttpHandler(h => h.IgnorePatterns.Add(m => m.RequestUri.AbsolutePath == _healthCheckPath));
+            });
+            services.AddJaeger(Configuration);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -39,7 +44,7 @@ namespace MyApp
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
-                endpoints.MapHealthChecks("/ping");
+                endpoints.MapHealthChecks(_healthCheckPath);
             });
         }
     }
