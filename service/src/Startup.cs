@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using System.Linq;
 using App.Metrics;
 using App.Metrics.Formatters.Prometheus;
@@ -7,19 +6,12 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Serilog;
 
 namespace MyApp
 {
     public class Startup
     {
-        private const string _healthCheckPath = "/ping";
-        private readonly HashSet<string> _metricsPaths = new HashSet<string>
-        {
-            "/metrics",
-            "/metrics-text",
-            "/env"
-        };
-
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
@@ -39,24 +31,24 @@ namespace MyApp
             {
                 x.ConfigureAspNetCore(options =>
                 {
-                    options.Hosting.IgnorePatterns.Add(ctx => ctx.Request.Path == _healthCheckPath);
-                    options.Hosting.IgnorePatterns.Add(ctx => _metricsPaths.Contains(ctx.Request.Path));
+                    options.Hosting.IgnorePatterns.Add(ctx => ctx.IsHealthCheckEndpoint());
+                    options.Hosting.IgnorePatterns.Add(ctx => ctx.IsMetricsEndpoint());
                 });
             });
             services.AddJaeger(Configuration);
 
             Metrics = AppMetrics.CreateDefaultBuilder()
                 .OutputMetrics.AsPrometheusPlainText()
-                .OutputMetrics.AsPrometheusProtobuf()
                 .Build();
 
             services.AddMetrics(Metrics);
             services.AddMetricsEndpoints(x =>
             {
+                x.MetricsEndpointEnabled = false;
+                x.EnvironmentInfoEndpointEnabled = false;
+
                 x.MetricsTextEndpointOutputFormatter =
                     Metrics.OutputMetricsFormatters.OfType<MetricsPrometheusTextOutputFormatter>().First();
-                x.MetricsEndpointOutputFormatter =
-                    Metrics.OutputMetricsFormatters.OfType<MetricsPrometheusProtobufOutputFormatter>().First();
             });
         }
 
@@ -72,11 +64,17 @@ namespace MyApp
 
             app.UseAuthorization();
 
+            app.UseSerilogRequestLogging(x =>
+            {
+                x.GetLevel = LoggingHelper.GetRequestLogLevel;
+            });
+
             app.UseMetricsAllEndpoints();
+
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
-                endpoints.MapHealthChecks(_healthCheckPath);
+                endpoints.MapHealthChecks(Constants.HealthCheckPath);
             });
         }
     }

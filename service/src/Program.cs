@@ -3,7 +3,6 @@ using App.Metrics.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
 using Serilog;
-using Serilog.Events;
 using Serilog.Formatting.Compact;
 
 namespace MyApp
@@ -13,10 +12,9 @@ namespace MyApp
         public static int Main(string[] args)
         {
             Log.Logger = new LoggerConfiguration()
-                .MinimumLevel.Override("Microsoft", LogEventLevel.Information)
                 .Enrich.FromLogContext()
                 .WriteTo.Console(new RenderedCompactJsonFormatter())
-                .CreateLogger();
+                .CreateBootstrapLogger();
 
             try
             {
@@ -37,8 +35,18 @@ namespace MyApp
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>
             Host.CreateDefaultBuilder(args)
-                .UseSerilog()
+                .UseSerilog((context, services, configuration) => configuration
+                    .ReadFrom.Configuration(context.Configuration)
+                    .ReadFrom.Services(services)
+                    .Enrich.FromLogContext()
+                    .WriteTo.Console(new RenderedCompactJsonFormatter()))
                 .UseMetrics()
+                .ConfigureAppMetricsHostingConfiguration(x =>
+                {
+                    // Configure to only support text metrics
+                    x.MetricsTextEndpoint = Constants.MetricsPath;
+                    x.MetricsEndpoint = null;
+                })
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
                     webBuilder.UseStartup<Startup>();
