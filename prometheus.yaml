@@ -12,3 +12,12 @@ prometheus:
       env:
       - name: JAEGER_AGENT_PORT
         value: "5755"  
+    additionalScrapeConfigs:
+    - job_name: 'app-metrics'
+      scrape_interval: 5s
+      metrics_path: /metrics
+      kubernetes_sd_configs:
+      - role: endpoints
+        namespaces:
+          names:
+          - apps
