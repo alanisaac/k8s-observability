@@ -64,5 +64,11 @@ The configurations of logging, metrics, and tracing above form an "observability
 
 - Services that are deployed in the "apps" namespace
 - Which log to the console in JSON format
-- Which expose metrics at "/metrics" in the Prometheus text format
+- Which expose metrics at `/metrics` in the Prometheus text format
 - Which send Jaeger trace data over UDP to the endpoint specified by the env variables `JAEGER_AGENT_HOST:JAEGER_AGENT_PORT`
+
+Other best practices include:
+
+- Excluding core endpoints from logging / metrics / tracing under normal operations, such as:
+  - Health checks
+  - The `/metrics` endpoint
