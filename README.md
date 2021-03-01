@@ -43,21 +43,31 @@ Values have been tweaked specifically to support a local Kubernetes cluster.  Fo
 ### Logging
 The logging solution is a full ELK stack, using the following tools:
 
-- Filebeat as the log collector and forwarder
-- Kafka to act as a log buffering mechanism
-- Logstash as the log aggregator and shipper
-- Elasticsearch as log storage
-- Kibana as the discovery and visualization tool
+- Filebeat for the log collector and forwarder
+- Kafka for the log buffering mechanism
+- Logstash for the log aggregator and shipper
+- Elasticsearch for log storage
+- Kibana for the discovery and visualization tool
 
-See [this article](https://logz.io/blog/deploying-kafka-with-elk/) from logz.io for diagrams and more on how these tools are set up and work together.
+See [the ELK architecture with Kafka](https://logz.io/blog/deploying-kafka-with-elk/) from logz.io for more information.
 
 ### Metrics
-The metrics solution is the Prometheus & Grafana stack.
+The metrics solution is the Prometheus & Grafana stack:
+
+- Kube State Metrics for Kubernetes object metrics
+- Prometheus for metric scraping and storage
+- Grafana for metric visualization
+
+See the [Prometheus architecture](https://prometheus.io/docs/introduction/overview/#architecture) for more information.
 
 ### Tracing
-The tracing solution is Jaeger, with an Elasticsearch backend.  Since Elasticsearch and Kafka are already deployed for logging, the same deployments are reused.
+The tracing solution is Jaeger, with an Elasticsearch backend.  Since Elasticsearch and Kafka are already deployed for logging, the same deployments are reused:
 
-See the Jaeger [architecture diagram](https://www.jaegertracing.io/docs/1.22/architecture/) for more information.
+- Jaeger for tracing agents and collectors
+- Kafka for the trace buffering mechanism
+- Elasticsearch for the storage backend
+
+See the [Jaeger architecture](https://www.jaegertracing.io/docs/1.22/architecture/) for more information.
 
 ### Service
 The configurations of logging, metrics, and tracing above form an "observability contract": any service which conforms to that contract will be monitored without additional configuration.  The contract is:
